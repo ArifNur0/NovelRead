@@ -20,8 +20,14 @@ PDFS_DIR = os.path.join(STATIC_DIR, "pdfs")
 COVER_WEB_PREFIX = "/static/covers"
 PDF_WEB_PREFIX = "/static/pdfs"
 
-# Vercel KV (Redis-compatible)
+# Vercel Blob store
+# Dipakai untuk menyimpan file cover/pdf + (di task ini) juga users/novels json.
+BLOB_STORE_ID = os.getenv("BLOB_STORE_ID", "")
+BLOB_READ_WRITE_TOKEN = os.getenv("BLOB_READ_WRITE_TOKEN", "")
+
+# Legacy: Vercel KV (boleh dikosongkan jika sudah migrasi ke Blob)
 KV_URL = os.getenv("KV_URL", "")
 KV_PREFIX = os.getenv("KV_PREFIX", "novelread:")
+
 
 

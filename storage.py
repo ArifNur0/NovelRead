@@ -38,8 +38,14 @@ def save_json(path: str, data: Any) -> None:
         os.replace(tmp, path)
 
 
+def _blob_enabled() -> bool:
+    return bool(getattr(config, "BLOB_STORE_ID", "") and getattr(config, "BLOB_READ_WRITE_TOKEN", ""))
+
+
 def _kv_enabled() -> bool:
+    # Legacy KV (masih dipakai kalau Blob belum diaktifkan)
     return bool(getattr(config, "KV_URL", ""))
+
 
 
 def _kv_key(kind: str) -> str:
@@ -82,11 +88,20 @@ def _kv_set_json(kind: str, data: Any) -> None:
 
 
 def get_users():
+    if _blob_enabled():
+        from api.blob_storage import blob_get_json
+
+        return blob_get_json("users", default=[])
     return _kv_get_json("users", default=[])
 
 
 def get_novels():
+    if _blob_enabled():
+        from api.blob_storage import blob_get_json
+
+        return blob_get_json("novels", default=[])
     return _kv_get_json("novels", default=[])
+
 
 
 def add_user(username: str, password_hash: str) -> dict:
@@ -96,8 +111,16 @@ def add_user(username: str, password_hash: str) -> dict:
     next_id = (max([u.get("id", 0) for u in users]) + 1) if users else 1
     user = {"id": next_id, "username": username, "password": password_hash}
     users.append(user)
-    _kv_set_json("users", users)
+
+    if _blob_enabled():
+        from api.blob_storage import blob_set_json
+
+        blob_set_json("users", users)
+    else:
+        _kv_set_json("users", users)
+
     return user
+
 
 
 def find_user_by_username(username: str):
@@ -121,8 +144,16 @@ def add_novel(user_id: int, title: str, author: str | None, cover_path: str, pdf
         "user_id": user_id,
     }
     novels.append(novel)
-    _kv_set_json("novels", novels)
+
+    if _blob_enabled():
+        from api.blob_storage import blob_set_json
+
+        blob_set_json("novels", novels)
+    else:
+        _kv_set_json("novels", novels)
+
     return novel
+
 
 
 def delete_novel(user_id: int, novel_id: int) -> bool:
@@ -142,8 +173,14 @@ def delete_novel(user_id: int, novel_id: int) -> bool:
         new_list.append(n)
 
     if deleted:
-        _kv_set_json("novels", new_list)
+        if _blob_enabled():
+            from api.blob_storage import blob_set_json
+
+            blob_set_json("novels", new_list)
+        else:
+            _kv_set_json("novels", new_list)
     return deleted
+
 
 
 
