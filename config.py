@@ -10,13 +10,18 @@ MYSQL_DB = os.getenv("MYSQL_DB", "koleksi_novel")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-change-me")
 
-# Upload folders (inside project)
+# Upload folders (local dev fallback)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 COVERS_DIR = os.path.join(STATIC_DIR, "covers")
 PDFS_DIR = os.path.join(STATIC_DIR, "pdfs")
 
-# Web paths to store in DB
+# Web paths to store in DB (local dev fallback)
 COVER_WEB_PREFIX = "/static/covers"
 PDF_WEB_PREFIX = "/static/pdfs"
+
+# Vercel KV (Redis-compatible)
+KV_URL = os.getenv("KV_URL", "")
+KV_PREFIX = os.getenv("KV_PREFIX", "novelread:")
+
 

@@ -2,4 +2,7 @@ Flask==3.0.3
 Werkzeug==3.0.3
 mysql-connector-python==9.0.0
 python-dotenv==1.0.1
+vercel_blob==0.1.0
+redis==5.0.8
+
 

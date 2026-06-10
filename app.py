@@ -26,12 +26,10 @@ from storage import (
     delete_novel,
 )
 
-
-
-
-
+import vercel_blob
 
 ALLOWED_COVER_EXT = {".jpg", ".jpeg", ".png"}
+
 
 
 
@@ -166,26 +164,62 @@ def create_app() -> Flask:
             pdf_filename = secure_filename(pdf_file.filename)
 
             uid = uuid.uuid4().hex
-            cover_on_disk = f"{uid}{cover_ext}"
-            pdf_on_disk = f"{uid}.pdf"
 
-            cover_abs = os.path.join(config.COVERS_DIR, cover_on_disk)
-            pdf_abs = os.path.join(config.PDFS_DIR, pdf_on_disk)
+            # Vercel Blob upload (serverless friendly). Store returned URLs in JSON/KV.
+            cover_url = None
+            pdf_url = None
 
-            cover_file.save(cover_abs)
-            pdf_file.save(pdf_abs)
+            # cover
+            if getattr(config, "BLOB_STORE_ID", None) and getattr(config, "BLOB_READ_WRITE_TOKEN", None):
+                blob_client = vercel_blob.BlobClient(
+                    store_id=config.BLOB_STORE_ID,
+                    token=config.BLOB_READ_WRITE_TOKEN,
+                )
 
-            cover_web_path = f"{config.COVER_WEB_PREFIX}/{cover_on_disk}"
-            pdf_web_path = f"{config.PDF_WEB_PREFIX}/{pdf_on_disk}"
+                cover_bytes = cover_file.read()
+                cover_ext_clean = os.path.splitext(cover_filename)[1].lower() or cover_ext
+                cover_blob_name = f"covers/{uid}{cover_ext_clean}"
+                cover_resp = blob_client.put(
+                    blob_name=cover_blob_name,
+                    data=cover_bytes,
+                    content_type=cover_file.mimetype or "image/jpeg",
+                )
+                cover_url = cover_resp.url
 
-            # persist to JSON
+                # pdf
+                pdf_bytes = pdf_file.read()
+                pdf_blob_name = f"pdfs/{uid}.pdf"
+                pdf_resp = blob_client.put(
+                    blob_name=pdf_blob_name,
+                    data=pdf_bytes,
+                    content_type="application/pdf",
+                )
+                pdf_url = pdf_resp.url
+            else:
+                # local dev fallback (writes to static folders)
+                cover_on_disk = f"{uid}{cover_ext}"
+                pdf_on_disk = f"{uid}.pdf"
+
+                cover_abs = os.path.join(config.COVERS_DIR, cover_on_disk)
+                pdf_abs = os.path.join(config.PDFS_DIR, pdf_on_disk)
+
+                cover_file.stream.seek(0)
+                pdf_file.stream.seek(0)
+                cover_file.save(cover_abs)
+                pdf_file.save(pdf_abs)
+
+                cover_url = f"{config.COVER_WEB_PREFIX}/{cover_on_disk}"
+                pdf_url = f"{config.PDF_WEB_PREFIX}/{pdf_on_disk}"
+
+            # persist to KV/JSON
             add_novel(
                 user_id=int(user_id),
                 title=title,
                 author=author,
-                cover_path=cover_web_path,
-                pdf_path=pdf_web_path,
+                cover_path=cover_url,
+                pdf_path=pdf_url,
             )
+
 
 
             flash("Novel berhasil ditambahkan.", "success")

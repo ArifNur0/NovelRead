@@ -3,6 +3,8 @@ import os
 import threading
 from typing import Any
 
+import config
+
 _LOCK = threading.Lock()
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -36,12 +38,55 @@ def save_json(path: str, data: Any) -> None:
         os.replace(tmp, path)
 
 
+def _kv_enabled() -> bool:
+    return bool(getattr(config, "KV_URL", ""))
+
+
+def _kv_key(kind: str) -> str:
+    return f"{config.KV_PREFIX}{kind}"  # includes trailing colon in prefix if desired
+
+
+def _kv_get_json(kind: str, default: Any) -> Any:
+    # Uses redis-compatible KV (Upstash). Requires KV_URL env.
+    if not _kv_enabled():
+        # fallback file system
+        if kind == "users":
+            return load_json(USERS_PATH)
+        if kind == "novels":
+            return load_json(NOVELS_PATH)
+        return default
+
+    import redis  # lazy import
+
+    r = redis.from_url(config.KV_URL, decode_responses=True)
+    key = _kv_key(kind)
+    val = r.get(key)
+    if val is None:
+        return default
+    return json.loads(val)
+
+
+def _kv_set_json(kind: str, data: Any) -> None:
+    if not _kv_enabled():
+        if kind == "users":
+            save_json(USERS_PATH, data)
+        elif kind == "novels":
+            save_json(NOVELS_PATH, data)
+        return
+
+    import redis  # lazy import
+
+    r = redis.from_url(config.KV_URL, decode_responses=True)
+    key = _kv_key(kind)
+    r.set(key, json.dumps(data, ensure_ascii=False))
+
+
 def get_users():
-    return load_json(USERS_PATH)
+    return _kv_get_json("users", default=[])
 
 
 def get_novels():
-    return load_json(NOVELS_PATH)
+    return _kv_get_json("novels", default=[])
 
 
 def add_user(username: str, password_hash: str) -> dict:
@@ -51,7 +96,7 @@ def add_user(username: str, password_hash: str) -> dict:
     next_id = (max([u.get("id", 0) for u in users]) + 1) if users else 1
     user = {"id": next_id, "username": username, "password": password_hash}
     users.append(user)
-    save_json(USERS_PATH, users)
+    _kv_set_json("users", users)
     return user
 
 
@@ -76,12 +121,12 @@ def add_novel(user_id: int, title: str, author: str | None, cover_path: str, pdf
         "user_id": user_id,
     }
     novels.append(novel)
-    save_json(NOVELS_PATH, novels)
+    _kv_set_json("novels", novels)
     return novel
 
 
 def delete_novel(user_id: int, novel_id: int) -> bool:
-    """Hapus novel milik user tertentu (JSON storage)."""
+    """Hapus novel milik user tertentu (JSON -> file system atau KV)."""
     novels = get_novels()
     new_list = []
     deleted = False
@@ -97,7 +142,8 @@ def delete_novel(user_id: int, novel_id: int) -> bool:
         new_list.append(n)
 
     if deleted:
-        save_json(NOVELS_PATH, new_list)
+        _kv_set_json("novels", new_list)
     return deleted
+
 
 
