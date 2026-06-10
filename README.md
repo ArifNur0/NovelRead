@@ -44,7 +44,5 @@ Server: `http://127.0.0.1:5000`
    - Upload cover (jpg/png) dan file PDF
 4. Dashboard akan menampilkan cover dan tombol **Baca**
 
-## Catatan
-- Lokasi cover/PDF disimpan di folder lokal project.
-- Database menyimpan `cover_path` dan `pdf_path` berupa path web `/static/...`.
+
 
