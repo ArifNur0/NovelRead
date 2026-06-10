@@ -1,6 +1,13 @@
 {
   "version": 2,
   "buildCommand": "pip install -r requirements.txt",
-  "outputDirectory": ""
+  "outputDirectory": "",
+  "functions": {
+    "api/app.py": {
+      "runtime": "python3.11"
+    }
+  }
+
 }
+
 
