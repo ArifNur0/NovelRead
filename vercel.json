@@ -4,7 +4,7 @@
   "outputDirectory": "",
   "functions": {
     "api/app.py": {
-      "runtime": "python@3.11"
+      "runtime": "now-python@3.11"
     }
   }
 }
