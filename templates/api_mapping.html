@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}API Mapping - Koleksi Novel{% endblock %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-2xl font-bold mb-2">Mapping API</h1>
+    <p class="text-zinc-400 mb-6 text-sm">
+      Dokumentasi ringkas endpoint yang tersedia di aplikasi.
+    </p>
+
+    <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <div class="p-4 border-b border-zinc-800 bg-zinc-900/30">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="font-semibold">Endpoint</h2>
+          <a class="text-sm text-blue-400 hover:text-blue-300 font-semibold" href="{{ url_for('dashboard') }}">Kembali</a>
+        </div>
+      </div>
+
+      <div class="p-4 space-y-4">
+        <div class="grid grid-cols-1 gap-2">
+          <div>
+            <div class="font-semibold">GET /</div>
+            <div class="text-sm text-zinc-300">Dashboard daftar novel (hanya user login).</div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">GET /login</div>
+            <div class="text-sm text-zinc-300">Menampilkan halaman login.</div>
+          </div>
+          <div class="pl-0">
+            <div class="font-semibold">POST /login</div>
+            <div class="text-sm text-zinc-300">Login user. Form: <span class="text-zinc-200">username, password</span>.</div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">GET /register</div>
+            <div class="text-sm text-zinc-300">Menampilkan halaman register.</div>
+          </div>
+          <div>
+            <div class="font-semibold">POST /register</div>
+            <div class="text-sm text-zinc-300">Membuat user. Form: <span class="text-zinc-200">username, password</span>.</div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">GET /logout</div>
+            <div class="text-sm text-zinc-300">Logout dan hapus session.</div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">GET /upload</div>
+            <div class="text-sm text-zinc-300">Halaman upload cover & PDF (hanya user login).</div>
+          </div>
+          <div>
+            <div class="font-semibold">POST /upload</div>
+            <div class="text-sm text-zinc-300">
+              Upload novel. Form-data: <span class="text-zinc-200">title, author, cover(file), pdf(file)</span>.
+            </div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">POST /dev/create-user</div>
+            <div class="text-sm text-zinc-300">(Dev) Membuat user cepat untuk testing. Form: <span class="text-zinc-200">username, password</span>.</div>
+          </div>
+
+          <div class="border-t border-zinc-800 pt-3">
+            <div class="font-semibold">File storage (static)</div>
+            <div class="text-sm text-zinc-300">
+              Cover: <span class="text-zinc-200">/static/covers/<filename></span> <br />
+              PDF: <span class="text-zinc-200">/static/pdfs/<filename></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 text-xs text-zinc-500 leading-relaxed">
+      Catatan: aplikasi menggunakan penyimpanan JSON untuk users & novels. Endpoint yang melibatkan upload akan menyimpan file ke folder `static/covers` dan `static/pdfs`.
+    </div>
+  </div>
+{% endblock %}
+

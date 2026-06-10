@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "A",
+    "author": "A",
+    "cover_path": "/static/covers/9a5c5f2499b44a47a0a95fe722dacd19.png",
+    "pdf_path": "/static/pdfs/9a5c5f2499b44a47a0a95fe722dacd19.pdf",
+    "uploaded_at": null,
+    "user_id": 1
+  },
+  {
+    "id": 2,
+    "title": "B",
+    "author": "B",
+    "cover_path": "/static/covers/a0ab164ae6dd4349bf1065747c909ea4.png",
+    "pdf_path": "/static/pdfs/a0ab164ae6dd4349bf1065747c909ea4.pdf",
+    "uploaded_at": null,
+    "user_id": 1
+  },
+  {
+    "id": 3,
+    "title": "Novel 3",
+    "author": "c",
+    "cover_path": "/static/covers/d740aaa599f842e2a132dd4abed13a61.jpeg",
+    "pdf_path": "/static/pdfs/d740aaa599f842e2a132dd4abed13a61.pdf",
+    "uploaded_at": null,
+    "user_id": 1
+  }
+]

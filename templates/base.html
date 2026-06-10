@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Koleksi Novel{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body class="bg-zinc-950 text-zinc-100">
+    <nav class="border-b border-zinc-800">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="{{ url_for('dashboard') }}" class="font-semibold tracking-wide text-white">Koleksi Novel</a>
+        <div class="flex items-center gap-3 text-sm">
+          <a href="{{ url_for('api_mapping') }}" class="px-3 py-1 rounded bg-zinc-800/60 hover:bg-zinc-800">API Mapping</a>
+          {% if session.get('user_id') %}
+            <span class="text-zinc-400">{{ session.get('username') }}</span>
+            <a href="{{ url_for('upload') }}" class="px-3 py-1 rounded bg-zinc-800/60 hover:bg-zinc-800">Upload</a>
+            <a href="{{ url_for('logout') }}" class="px-3 py-1 rounded bg-red-600 hover:bg-red-500">Logout</a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500">Login</a>
+          {% endif %}
+        </div>
+
+      </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-6">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="space-y-2 mb-4">
+            {% for category, message in messages %}
+              <div class="p-3 rounded border border-zinc-800 text-sm {% if category == 'error' %}bg-red-900/30{% else %}bg-emerald-900/30{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
+

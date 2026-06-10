@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload - Koleksi Novel{% endblock %}
+
+{% block content %}
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-bold mb-2">Tambah Novel</h1>
+    <p class="text-zinc-400 text-sm mb-6">Upload cover (jpg/png) dan file PDF.</p>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      <div>
+        <label class="text-sm text-zinc-300">Judul</label>
+        <input name="title" required class="mt-1 w-full rounded bg-zinc-900 border border-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="text-sm text-zinc-300">Penulis (opsional)</label>
+        <input name="author" class="mt-1 w-full rounded bg-zinc-900 border border-zinc-800 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="text-sm text-zinc-300">Cover (JPG/PNG)</label>
+        <input type="file" name="cover" accept="image/*" required class="mt-1 w-full text-sm text-zinc-300" />
+      </div>
+
+      <div>
+        <label class="text-sm text-zinc-300">PDF Novel</label>
+        <input type="file" name="pdf" accept="application/pdf" required class="mt-1 w-full text-sm text-zinc-300" />
+      </div>
+
+      <button type="submit" class="w-full rounded bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-semibold">Simpan</button>
+    </form>
+  </div>
+{% endblock %}
+
