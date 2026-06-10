@@ -24,12 +24,11 @@ def _client() -> Any:
 
 
 def _get_or_default(blob_name: str, default: Any) -> Any:
+    # Blob might be unavailable/misconfigured on Vercel (env vars not set, wrong token, etc).
+    # This function must never crash the app.
     client = _client()
     try:
-        # `get` returns Blob metadata + content stream depending on SDK.
-        # To keep this code robust, we read `content` if present.
         resp = client.get(blob_name)
-        # SDK shape can vary; support common fields.
         if isinstance(resp, (bytes, bytearray)):
             return json.loads(resp.decode("utf-8"))
         if isinstance(resp, str):
@@ -41,10 +40,10 @@ def _get_or_default(blob_name: str, default: Any) -> Any:
             return json.loads(raw)
         if hasattr(resp, "text"):
             return json.loads(resp.text)
-        # last resort: try json dumping of resp
         return json.loads(resp)
     except Exception:
         return default
+
 
 
 def blob_get_json(kind: str, default: Any) -> Any:
